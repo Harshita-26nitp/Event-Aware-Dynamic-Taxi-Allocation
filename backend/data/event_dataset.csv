@@ -1,0 +1,18 @@
+text,label,multiplier
+concert at madison square garden,concert,1.8
+live music festival in central park,concert,1.8
+nba finals game night,sports,1.7
+knicks playoff match,sports,1.7
+heavy rain in manhattan,weather,1.5
+snowstorm in nyc,weather,1.6
+thunderstorm alert,weather,1.6
+flight delay at jfk airport,travel,1.6
+lga airport congestion,travel,1.6
+morning rush hour traffic,commute,1.4
+evening subway rush,commute,1.4
+university exam week,exam,1.35
+school exams starting,exam,1.35
+fire emergency in brooklyn,emergency,1.0
+ambulance required accident,emergency,1.0
+normal day traffic,normal,1.2
+regular weekday commute,normal,1.2

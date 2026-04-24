@@ -1,0 +1,9 @@
+{
+  "concert": ["concert", "music", "live show", "festival", "dj", "band"],
+  "sports": ["nba", "match", "game", "finals", "playoff", "cricket", "football"],
+  "weather": ["rain", "storm", "snow", "thunder", "hurricane", "windy"],
+  "travel": ["airport", "flight", "delay", "boarding", "luggage"],
+  "commute": ["rush hour", "traffic", "office time", "metro"],
+  "exam": ["exam", "test", "school", "college", "university"],
+  "emergency": ["accident", "ambulance", "fire", "police", "emergency"]
+}

@@ -1,0 +1,60 @@
+# ✅ QUICK CODESPACES SETUP
+
+## 📋 What to Do (Copy Your URLs Here):
+
+1. **Open VS Code → Bottom Panel → Ports tab**
+
+2. **Find port 8000:**
+   - Copy the "Forwarded Address"
+   - Paste here: `https://solid-invention-x5r94jj4qg64h9xpw-8000.app.github.dev/`
+
+3. **Find port 5173:**
+   - Copy the "Forwarded Address"  
+   - Paste here: `https://solid-invention-x5r94jj4qg64h9xpw-5174.app.github.dev/`
+
+---
+
+## 🔧 Configuration Steps:
+
+### Step 1: Update frontend/.env.local
+Replace the URL with your port 8000 forwarded address:
+```env
+VITE_API_URL=https://YOUR-CODESPACE-NAME-8000.app.github.dev
+```
+
+### Step 2: Update backend/app.py
+Add your port 5173 forwarded address to the allow_origins list. Find this section:
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://YOUR-CODESPACE-NAME-5173.app.github.dev"  # ← ADD THIS LINE
+    ],
+```
+
+### Step 3: Make port 8000 Public
+- Ports tab → right-click **port 8000** → **Port Visibility** → **Public**
+
+### Step 4: Restart Services
+- **Backend:** Stop and restart FastAPI
+- **Frontend:** Will auto-reload when you save .env.local
+
+---
+
+## ✨ Optional: Auto-Update Script
+
+Copy both URLs and run in terminal:
+```bash
+cd /workspaces/codespaces-blank/nyc-ai-dispatch-system
+export BACKEND_URL="https://YOUR-CODESPACE-NAME-8000.app.github.dev"
+export FRONTEND_URL="https://YOUR-CODESPACE-NAME-5173.app.github.dev"
+
+# Update .env.local
+sed -i "s|VITE_API_URL=.*|VITE_API_URL=$BACKEND_URL|" frontend/.env.local
+
+# Show the update needed for backend
+echo "Add this line to backend/app.py allow_origins:"
+echo "    \"$FRONTEND_URL\","
+```
