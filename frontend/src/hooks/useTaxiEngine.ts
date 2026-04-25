@@ -2,20 +2,20 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { ZONES } from "../zones";
 
 export function useTaxiEngine(serverTaxis: any[] = []) {
- const initialTaxis = useMemo(() => {
+  const initialTaxis = useMemo(() => {
     return serverTaxis.map((t: any) => {
-        const from = ZONES.find((z) => z.name === t.zone)
-                  ?? ZONES[Math.floor(Math.random() * ZONES.length)];
-        const to   = ZONES[Math.floor(Math.random() * ZONES.length)];
+      const from = ZONES.find((z) => z.name === t.zone)
+                ?? ZONES[Math.floor(Math.random() * ZONES.length)];
+      const to   = ZONES[Math.floor(Math.random() * ZONES.length)];
 
-        return {
-          ...t,
-          from,
-          to,
-          progress: Math.random(),
-          speed: 0.003 + Math.random() * 0.007,
-        };
-      });
+      return {
+        ...t,
+        from,
+        to,
+        progress: Math.random(),
+        speed: 0.003 + Math.random() * 0.007,
+      };
+    });
   }, [serverTaxis]);
 
   const [taxis, setTaxis] = useState<any[]>(initialTaxis);
