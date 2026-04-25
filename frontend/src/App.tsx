@@ -1,96 +1,61 @@
 import { useState } from "react";
 import { predict, simulateTaxis } from "./api";
-
 import MapView from "./components/MapView";
 import Metrics from "./components/Metrics";
 import TopZones from "./components/TopZones";
 import Sidebar from "./components/Sidebar";
 
-/* ---------------- TYPES ---------------- */
-
-type Allocation = {
-  zone?: string;
-  taxis?: number;
-  demand?: number;
-  lat?: number;
-  lng?: number;
-};
-
-type Zone = {
-  name: string;
-  value?: number;
-};
-
-type PredictionData = {
-  allocations?: Allocation[];
-  zones?: Zone[];
-};
-
-type Taxi = {
-  id?: string | number;
-  lat: number;
-  lng: number;
-  status?: string;
-};
-
-/* ---------------- COMPONENT ---------------- */
-
 export default function App() {
-  const [data, setData] = useState<PredictionData | null>(null);
-  const [taxis, setTaxis] = useState<Taxi[]>([]);
+  const [data, setData] = useState<any>(null);
+  const [taxis, setTaxis] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const run = async (text: string) => {
-    console.log("🚀 Event Input:", text);
-
-    if (!text || text.trim() === "") {
-      console.log("⚠️ Empty input ignored");
-      return;
-    }
-
+    setLoading(true);
     try {
-      // 1️⃣ Call prediction API
       const res = await predict(text);
-      console.log("📦 Predict response:", res);
-
-      // 2️⃣ Get allocations safely
-      const allocations = res?.allocations || [];
-
-      // 3️⃣ Simulate taxis
-      const taxiSim = await simulateTaxis(allocations);
-      console.log("🚕 Taxi response:", taxiSim);
-
-      // 4️⃣ Update UI
-      setData(res || null);
-      setTaxis(Array.isArray(taxiSim) ? taxiSim : []);
+      const taxiSim = await simulateTaxis(res.allocations || []);
+      setData(res);
+      setTaxis(taxiSim || []);
     } catch (error) {
-      console.error("❌ Error in run:", error);
+      console.error("Error in run:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex bg-gray-950 min-h-screen text-white">
-
-      {/* Sidebar */}
-      <Sidebar onRun={run} />
-
-      {/* Main Content */}
-      <div className="flex-1 p-4 space-y-4">
-
-        <h1 className="text-2xl font-bold text-blue-400">
-          🚕 Event Aware Dynamic Taxi Allocation
-        </h1>
-
-        {/* Metrics */}
-        <Metrics data={data} />
-
-        {/* Top Zones */}
-        tsx<TopZones zones={Array.isArray(data?.zones) ? data.zones : []} />
-
-        {/* Map */}
-        <div className="bg-gray-900 p-2 rounded-lg">
-          <MapView taxisData={taxis} />
+    <div style={{ minHeight: "100vh", background: "#050a13", color: "#e2e8f0", fontFamily: "monospace" }}>
+      <div style={{ borderBottom: "1px solid #0ff3", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#070d1a" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#00fff7" }} />
+          <span style={{ color: "#00fff7", fontWeight: 700, fontSize: 18, letterSpacing: 2 }}>NYC AI DISPATCH</span>
+          <span style={{ color: "#334155", fontSize: 12, marginLeft: 8 }}>EVENT-AWARE DYNAMIC TAXI ALLOCATION</span>
         </div>
+        <div style={{ display: "flex", gap: 16, fontSize: 11, color: "#0ff8" }}>
+          <span>GNN: GraphSAGE</span>
+          <span style={{ color: "#1e293b" }}>|</span>
+          <span>RL: DQN Agent</span>
+          <span style={{ color: "#1e293b" }}>|</span>
+          <span>ML: TF-IDF</span>
+          <span style={{ color: "#1e293b" }}>|</span>
+          <span>Data: NYC TLC 2026</span>
+        </div>
+      </div>
 
+      <div style={{ display: "flex", height: "calc(100vh - 53px)" }}>
+        <Sidebar onRun={run} loading={loading} />
+        <div style={{ flex: 1, padding: 16, overflowY: "auto" as const, display: "flex", flexDirection: "column" as const, gap: 16 }}>
+          <Metrics data={data} />
+          <div style={{ display: "flex", gap: 16, flex: 1, minHeight: 0 }}>
+            <div style={{ flex: 1 }}>
+              <MapView taxisData={taxis} allocations={data?.allocations || []} />
+            </div>
+            <div style={{ width: 260 }}>
+              <TopZones zones={Array.isArray(data?.zones) ? data.zones : []} allocations={data?.allocations || []} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
