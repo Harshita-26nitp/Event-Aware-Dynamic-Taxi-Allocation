@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Uses VITE_API_URL from .env.local, falls back to localhost for local development
 const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const predict = async (text: string) => {
@@ -12,9 +11,7 @@ export const predict = async (text: string) => {
 
 export const simulateTaxis = async (allocations: any[]) => {
   console.log("Calling simulateTaxis with:", allocations);
-  const res = await axios.post(`${BASE}/simulate-taxis`, {
-    allocations,
-  });
+  const res = await axios.post(`${BASE}/simulate-taxis`, { allocations });
   console.log("SimulateTaxis API response:", res.data);
   return res.data.taxis;
 };
