@@ -12,7 +12,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # ✅ B6 fixed
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,20 +48,19 @@ def home():
 def predict(payload: dict):
     text = payload.get("text", "")
 
-    event = classifier.predict(text)       # ✅ B1 fixed — ML files exist
+    event = classifier.predict(text)
     base_fare = 10
     fare = compute_fare(base_fare, event)
 
     data_df = get_data()
 
-    # ✅ B4 fixed — GNN is now called
+    # ✅ FIXED — build_graph returns a single Data object, not a tuple
     features = np.random.rand(25, 5).tolist()
-    graph_data, _ = build_graph(features)
-    print(f"GNN graph nodes: {graph_data.num_nodes}")
+    graph_data = build_graph(features)
+    print(f"GNN graph built: nodes={graph_data.num_nodes}, edges={graph_data.num_edges}")
 
     top_zones = data_df.nlargest(5, "demand")["PULocationID"].tolist()
 
-    # ✅ B5 fixed — RL Agent makes allocation decision
     state_dim = len(top_zones)
     action_dim = len(top_zones)
     dqn_model = DQN(state_dim, action_dim)
@@ -80,7 +79,7 @@ def predict(payload: dict):
     return {
         "event": event,
         "fare": fare,
-        "zones": data_df.to_dict(orient="records"),   # ✅ B3 fixed
+        "zones": data_df.to_dict(orient="records"),
         "allocations": allocations,
     }
 
