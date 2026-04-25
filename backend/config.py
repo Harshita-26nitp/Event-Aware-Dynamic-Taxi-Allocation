@@ -5,7 +5,7 @@ import os
 # ======================
 DATA_DIR = "data"
 
-TLC_TRIPS_PATH = os.path.join(DATA_DIR, "nyc_yellow_tripdata_2026-01.parquet")
+TLC_TRIPS_PATH = os.path.join(DATA_DIR, "yellow_tripdata_2026-01.parquet")
 ZONE_LOOKUP_PATH = os.path.join(DATA_DIR, "taxi_zone_lookup.csv")
 
 EVENT_DATASET_PATH = os.path.join(DATA_DIR, "event_dataset.csv")

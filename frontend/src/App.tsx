@@ -84,7 +84,7 @@ export default function App() {
         <Metrics data={data} />
 
         {/* Top Zones */}
-        <TopZones zones={data?.zones || []} />
+        tsx<TopZones zones={Array.isArray(data?.zones) ? data.zones : []} />
 
         {/* Map */}
         <div className="bg-gray-900 p-2 rounded-lg">

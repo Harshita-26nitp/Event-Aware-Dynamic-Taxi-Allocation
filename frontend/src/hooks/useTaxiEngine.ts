@@ -1,18 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { ZONES } from "../zones";
 
 export function useTaxiEngine(serverTaxis: any[] = []) {
-  const [taxis, setTaxis] = useState<any[]>([]);
+ const initialTaxis = useMemo(() => {
+    return serverTaxis.map((t: any) => {
+        const from = ZONES.find((z) => z.name === t.zone)
+                  ?? ZONES[Math.floor(Math.random() * ZONES.length)];
+        const to   = ZONES[Math.floor(Math.random() * ZONES.length)];
+
+        return {
+          ...t,
+          from,
+          to,
+          progress: Math.random(),
+          speed: 0.003 + Math.random() * 0.007,
+        };
+      });
+  }, [serverTaxis]);
+
+  const [taxis, setTaxis] = useState<any[]>(initialTaxis);
 
   useEffect(() => {
-    const init = serverTaxis.map((t: any) => ({
-      ...t,
-      from: ZONES[t.fromZone],
-      to: ZONES[t.toZone],
-    }));
+    setTaxis(initialTaxis);
+  }, [initialTaxis]);
 
-    setTaxis(init);
-  }, [serverTaxis]);
+  const rafRef = useRef<number>();
 
   useEffect(() => {
     const animate = () => {
@@ -21,22 +33,22 @@ export function useTaxiEngine(serverTaxis: any[] = []) {
           let p = t.progress + t.speed;
 
           if (p >= 1) {
-            return {
-              ...t,
-              from: t.to,
-              to: ZONES[Math.floor(Math.random() * 25)],
-              progress: 0,
-            };
+            const next = ZONES[Math.floor(Math.random() * ZONES.length)];
+            return { ...t, from: t.to, to: next, progress: 0 };
           }
 
           return { ...t, progress: p };
         })
       );
 
-      requestAnimationFrame(animate);
+      rafRef.current = requestAnimationFrame(animate);
     };
 
-    requestAnimationFrame(animate);
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   return taxis;
