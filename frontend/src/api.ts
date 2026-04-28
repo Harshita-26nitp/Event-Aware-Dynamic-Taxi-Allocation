@@ -21,12 +21,7 @@ export const predict = async (text: string) => {
 
 export const simulateTaxis = async (allocations: any[]) => {
   console.log("Calling simulateTaxis with:", allocations);
-  try {
-    const res = await axios.post(`${BASE}/simulate-taxis`, { allocations });
-    console.log("SimulateTaxis API response:", res.data);
-    return res.data.taxis;
-  } catch (err: any) {
-    console.error("simulateTaxis error:", err);
-    return []; // ✅ Return empty array instead of crashing
-  }
+  const res = await axios.post(`${BASE}/simulate-taxis`, { allocations });
+  console.log("SimulateTaxis API response:", res.data);
+  return res.data.taxis;
 };

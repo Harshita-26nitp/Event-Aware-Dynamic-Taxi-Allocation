@@ -67,12 +67,13 @@ def predict(payload: dict):
             content={"error": event["error"]}
         )
 
+    event = classifier.predict(text)
     base_fare = 10
     fare = compute_fare(base_fare, event)
 
     data_df = get_data()
 
-    # ✅ FIX 4 — build_graph returns single Data object, not tuple
+    # ✅ FIXED — build_graph returns a single Data object, not a tuple
     features = np.random.rand(25, 5).tolist()
     graph_data = build_graph(features)
     print(f"GNN graph built: nodes={graph_data.num_nodes}, edges={graph_data.num_edges}")
