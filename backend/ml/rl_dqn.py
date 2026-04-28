@@ -9,7 +9,9 @@ class DQN(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(state_dim, 128),
             nn.ReLU(),
-            nn.Linear(128, action_dim)
+            nn.Linear(128, 64),   # ✅ Added extra layer for better learning
+            nn.ReLU(),
+            nn.Linear(64, action_dim)
         )
 
     def forward(self, x):
@@ -23,8 +25,18 @@ class Agent:
         self.gamma = 0.95
 
     def act(self, state):
-        if random.random() < self.epsilon:
-            return random.randint(0, len(state)-1)
+        # ✅ Safety check — empty state
+        if not state or len(state) == 0:
+            return 0
 
-        q = self.model(torch.FloatTensor(state))
-        return torch.argmax(q).item()
+        # ✅ Safety check — replace any NaN or inf values
+        state = [float(s) if not (np.isnan(s) or np.isinf(s)) else 0.0 for s in state]
+
+        # Explore randomly
+        if random.random() < self.epsilon:
+            return random.randint(0, len(state) - 1)
+
+        # ✅ Use no_grad for inference — saves memory, faster
+        with torch.no_grad():
+            q = self.model(torch.FloatTensor(state))
+            return torch.argmax(q).item()

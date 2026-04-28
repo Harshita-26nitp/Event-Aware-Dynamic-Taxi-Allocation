@@ -4,9 +4,19 @@ const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const predict = async (text: string) => {
   console.log("Calling predict with:", text);
-  const res = await axios.post(`${BASE}/predict`, { text });
-  console.log("Predict API response:", res.data);
-  return res.data;
+  try {
+    const res = await axios.post(`${BASE}/predict`, { text });
+    console.log("Predict API response:", res.data);
+    return res.data;
+  } catch (err: any) {
+    // ✅ When backend returns 400 or 422, axios throws — extract the error message
+    if (err.response?.data?.error) {
+      // Return error as a normal object so App.tsx can handle it cleanly
+      return { error: err.response.data.error };
+    }
+    // Network error or server down
+    throw new Error("Cannot reach backend. Make sure it is running on port 8000.");
+  }
 };
 
 export const simulateTaxis = async (allocations: any[]) => {
