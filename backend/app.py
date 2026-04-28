@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from ml.event_tfidf import EventClassifier
 from ml.pipeline import load_data, aggregate
 from ml.surge_engine import compute_fare
 from ml.rl_dqn import DQN, Agent
 from graph.build_graph import build_graph
+
 import random
 import numpy as np
 
@@ -46,15 +48,31 @@ def home():
 
 @app.post("/predict")
 def predict(payload: dict):
-    text = payload.get("text", "")
+    text = payload.get("text", "").strip()
 
+    # ✅ FIX 1 — Reject empty input immediately
+    if not text:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Please enter an event description."}
+        )
+
+    # ✅ FIX 2 — Classifier now validates input and checks confidence
     event = classifier.predict(text)
+
+    # ✅ FIX 3 — If classifier returns error (gibberish/invalid), send to frontend
+    if event.get("error"):
+        return JSONResponse(
+            status_code=422,
+            content={"error": event["error"]}
+        )
+
     base_fare = 10
     fare = compute_fare(base_fare, event)
 
     data_df = get_data()
 
-    # ✅ FIXED — build_graph returns a single Data object, not a tuple
+    # ✅ FIX 4 — build_graph returns single Data object, not tuple
     features = np.random.rand(25, 5).tolist()
     graph_data = build_graph(features)
     print(f"GNN graph built: nodes={graph_data.num_nodes}, edges={graph_data.num_edges}")
@@ -101,3 +119,4 @@ def simulate_taxis(payload: dict):
             })
             taxi_id += 1
     return {"taxis": taxis}
+
